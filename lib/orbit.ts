@@ -1,31 +1,32 @@
 import crypto from "crypto";
 
-class ConsistentHashRing {
+export default class ConsistentHashRing {
     ring: Map<string, string>;
     sortedKeys: string[];
     virtualNodes: number;
-    constructor(nodes: string[], virtualNodes = 100) {
+    algorithm: "md5" | "sha1" | "sha256" | "sha512";
+    constructor(nodes: string[], virtualNodes = 160, algorithm: "md5" | "sha1" | "sha256" | "sha512" = "md5") {
         this.ring = new Map();
         this.sortedKeys = [];
         this.virtualNodes = virtualNodes;
+        this.algorithm = algorithm;
 
         nodes.forEach((node) => {
             for (let i = 0; i < virtualNodes; i++) {
                 const vNodeName = `${node}#${i}`;
-                const hash = this.convertToHash(vNodeName);
-                this.ring.set(hash, node);
-                this.sortedKeys.push(hash);
+                const vHash = this.convertToHash(vNodeName);
+                this.ring.set(vHash, node);
+                this.sortedKeys.push(vHash);
             }
         });
-
-        this.sortedKeys.sort((a, b) => a.localeCompare(b));
+        this.sortedKeys.sort((a, b)=>a.localeCompare(b));
     }
 
     convertToHash(key: string) {
-        return crypto.createHash("md5").update(key).digest("hex");
+        return crypto.createHash(this.algorithm).update(key).digest("hex");
     }
 
-    getNode(key: string) {
+    get(key: string) {
         const keyHash = this.convertToHash(key);
         let low = 0;
         let high = this.sortedKeys.length - 1;
@@ -51,19 +52,39 @@ class ConsistentHashRing {
         return this.ring.get(targetHash!);
     }
 
+
+    addNode(node: string) {
+        for (let i = 0; i < this.virtualNodes; i++) {
+            const vNodeName = `${node}#${i}`;
+            const vHash = this.convertToHash(vNodeName);
+            this.ring.set(vHash, node);
+            this.sortedKeys.push(vHash);
+        }
+        this.sortedKeys.sort((a, b)=>a.localeCompare(b));
+    }
+
+    removeNode(node: string) {
+        for (let i = 0; i < this.virtualNodes; i++) {
+            const vNodeName = `${node}#${i}`;
+            const vHash = this.convertToHash(vNodeName);
+            this.ring.delete(vHash);
+            this.sortedKeys = this.sortedKeys.filter((key) => key !== vHash);
+        }
+    }
+
     getKeyDistribution(keys: string[] = []) {
-        const countMap = new Map();
+        const countMap: Map<string, number> = new Map();
 
         for (const key of keys) {
-            const node = this.getNode(key);
-            countMap.set(node, (countMap.get(node) || 0) + 1);
+            const node = this.get(key);
+            countMap.set(node!, (countMap.get(node!) || 0) + 1);
         }
 
         const total = keys.length;
         const distribution: Record<string, { count: number; percent: string }> = {};
 
         for (const [node, count] of countMap.entries()) {
-            distribution[node] = {
+            distribution[node!] = {
                 count,
                 percent: ((count / total) * 100).toFixed(2) + "%"
             };
@@ -71,21 +92,4 @@ class ConsistentHashRing {
 
         return distribution;
     }
-}
-
-const ring = new ConsistentHashRing(
-    ["shard1", "shard2", "shard3", "shard4", "shard5", "shard6", "shard7", "shard8", "shard9", "shard10"],
-    100
-);
-
-const keys: string[] = [];
-for (let i = 0; i < 100000; i++) {
-    keys.push(`user${i}`);
-}
-
-const distribution = ring.getKeyDistribution(keys);
-
-console.log("Shard Distribution (based on 100,000 keys):\n");
-for (const [shard, stats] of Object.entries(distribution)) {
-    console.log(`${shard}: ${stats.count} keys (${stats.percent})`);
 }

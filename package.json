@@ -1,26 +1,40 @@
 {
   "name": "hashorbit",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Lightweight library for consistent hashing",
   "main": "dist/src/index.js",
   "module": "dist/src/index.js",
+  "type": "commonjs",
   "exports": {
     ".": {
       "require": "./dist/src/index.js",
-      "import": "./dist/src/index.js",
-      "types": "./dist/src/index.d.ts"
+      "import": "./dist/src/index.js"
     }
   },
+  "types": "dist/src/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node dist/src/index.js"
+    "test": " jest",
+    "dev": "npm run build && node dist/src/index.js",
+    "build": "tsc -b"
   },
   "author": "Mathura",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Torque-Lab/HashOrbit.git"
+  },
   "dependencies": {
     "@types/node": "^24.1.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "jest": "^30.0.5",
+    "ts-jest": "^29.4.1"
   }
 }
