@@ -13,7 +13,7 @@ describe("ConsistentHashRing Key Distribution", () => {
     );
 
     const keys: string[] = [];
-    for (let i = 0; i < 1000000; i++) {
+    for (let i = 0; i < 1_000_000; i++) {
         keys.push(`user${i}`);
     }
 
@@ -43,7 +43,7 @@ describe("ConsistentHashRing Key Distribution", () => {
 
     // Optional: Log distribution (for visual review)
     it("log shard distribution (manual review)", () => {
-        console.log("\nShard Distribution (based on 10,00,000 keys):\n");
+        console.log("\nShard Distribution (based on 1,000,000 keys):\n");
         for (const [shard, stats] of Object.entries(distribution)) {
             console.log(`${shard}: ${stats.count} keys (${stats.percent})`);
         }

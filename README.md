@@ -1,10 +1,10 @@
-# HashOrbit
+# HashVector
 
-[![npm version](https://img.shields.io/npm/v/hashorbit.svg?style=flat-square)](https://www.npmjs.com/package/hashorbit)
+[![npm version](https://img.shields.io/npm/v/hashvector.svg?style=flat-square)](https://www.npmjs.com/package/hashvector)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![CI](https://github.com/Torque-Lab/HashOrbit/actions/workflows/ci.yml/badge.svg)](https://github.com/Torque-Lab/HashOrbit/actions)
+[![CI](https://github.com/Torque-Lab/HashVector/actions/workflows/ci.yml/badge.svg)](https://github.com/Torque-Lab/HashVector/actions)
 
-A high-performance, type-safe consistent hashing library for Node.js and TypeScript. HashOrbit provides consistent hashing with virtual nodes, supporting multiple hashing algorithms and offering excellent key distribution across shards.
+A high-performance, type-safe consistent hashing library for Node.js and TypeScript. HashVector provides consistent hashing with virtual nodes, supporting multiple hashing algorithms and offering excellent key distribution across shards.
 
 ## Features
 
@@ -18,9 +18,9 @@ A high-performance, type-safe consistent hashing library for Node.js and TypeScr
 ## Installation
 
 ```bash
-npm install hashorbit
+npm install hashvector
 # or
-yarn add hashorbit
+yarn add hashvector
 ```
 
 ## Usage
@@ -28,7 +28,7 @@ yarn add hashorbit
 ### Basic Usage
 
 ```typescript
-import ConsistentHashRing from 'hashorbit';
+import ConsistentHashRing from 'hashvector';
 
 // Create a new consistent hash ring
 const ring = new ConsistentHashRing(
@@ -92,7 +92,7 @@ Gets the distribution of keys across nodes.
 
 ## Performance
 
-HashOrbit is designed for high performance with O(log n) lookup time, where n is the number of virtual nodes in the ring.
+HashVector is designed for high performance with O(log n) lookup time, where n is the number of virtual nodes in the ring.
 
 ## License
 
