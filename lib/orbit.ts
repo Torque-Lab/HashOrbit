@@ -1,10 +1,10 @@
 import crypto from "crypto";
 
 export default class ConsistentHashRing {
-    ring: Map<string, string>;
-    sortedKeys: string[];
-    virtualNodes: number;
-    algorithm: "md5" | "sha1" | "sha256" | "sha512";
+   private ring: Map<string, string>;
+   private sortedKeys: string[];
+   private virtualNodes: number;
+   private algorithm: "md5" | "sha1" | "sha256" | "sha512";
     constructor(nodes: string[], virtualNodes = 160, algorithm: "md5" | "sha1" | "sha256" | "sha512" = "md5") {
         this.ring = new Map();
         this.sortedKeys = [];
@@ -22,11 +22,11 @@ export default class ConsistentHashRing {
         this.sortedKeys.sort((a, b)=>a.localeCompare(b));
     }
 
-    convertToHash(key: string) {
+    private convertToHash(key: string) {
         return crypto.createHash(this.algorithm).update(key).digest("hex");
     }
 
-    get(key: string) {
+    public get(key: string) {
         const keyHash = this.convertToHash(key);
         let low = 0;
         let high = this.sortedKeys.length - 1;
@@ -52,8 +52,22 @@ export default class ConsistentHashRing {
         return this.ring.get(targetHash!);
     }
 
-
-    addNode(node: string) {
+    public getRing() {
+        return this.ring;
+    }
+    public getSortedKeys() {
+        return this.sortedKeys;
+    }
+    public getVirtualNodes() {
+        return this.virtualNodes;
+    }
+    public getAlgorithm() {
+        return this.algorithm;
+    }
+    public getNodes() {
+        return this.ring.values();
+    }
+    public addNode(node: string) {
         for (let i = 0; i < this.virtualNodes; i++) {
             const vNodeName = `${node}#${i}`;
             const vHash = this.convertToHash(vNodeName);
@@ -63,7 +77,7 @@ export default class ConsistentHashRing {
         this.sortedKeys.sort((a, b)=>a.localeCompare(b));
     }
 
-    removeNode(node: string) {
+    public removeNode(node: string) {
         for (let i = 0; i < this.virtualNodes; i++) {
             const vNodeName = `${node}#${i}`;
             const vHash = this.convertToHash(vNodeName);
@@ -72,7 +86,7 @@ export default class ConsistentHashRing {
         }
     }
 
-    getKeyDistribution(keys: string[] = []) {
+    public getKeyDistribution(keys: string[] = []) {
         const countMap: Map<string, number> = new Map();
 
         for (const key of keys) {
