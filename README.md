@@ -14,12 +14,16 @@ A high-performance, type-safe consistent hashing library for Node.js and TypeScr
 - 🔒 **Multiple Hash Algorithms**: Supports MD5, SHA-1, SHA-256, and SHA-512
 - 📦 **TypeScript Support**: Full type definitions included
 - 🎯 **Minimal Dependencies**: Lightweight with no unnecessary dependencies
+- 📊 **Minimum Key Movement**: Minimizes key movement on node addition and removal by using virtual nodes
+- 📊 **Key Movement Tracking**: Tracks key movement on node addition and removal
 
 ## Installation
 
 ```bash
 npm install hashvector
-# or
+#or
+pnpm install hashvector
+#or
 yarn add hashvector
 ```
 
