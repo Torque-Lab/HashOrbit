@@ -49,7 +49,7 @@ export default class ConsistentHashRing {
                 ? this.sortedKeys[0]
                 : this.sortedKeys[resultIndex];
 
-        return this.ring.get(targetHash!);
+        return this.ring.get(targetHash || "");
     }
 
     public getRing() {
@@ -66,6 +66,9 @@ export default class ConsistentHashRing {
     }
     public getNodes() {
         return this.ring.values();
+    }
+    public getPhysicalNodes(): string[] {
+        return Array.from(new Set(this.ring.values()));
     }
     public addNode(node: string) {
         for (let i = 0; i < this.virtualNodes; i++) {
@@ -106,4 +109,55 @@ export default class ConsistentHashRing {
 
         return distribution;
     }
+    public trackKeyMovementOnAddNode(node: string, keys: string[]) {
+        const oldMapping = new Map<string, string>();
+        
+        for (const key of keys) {
+            const currentNode = this.get(key) || "";
+            oldMapping.set(key, currentNode);
+        }
+        this.addNode(node);
+        
+        const changedKeys: string[] = [];
+        const movement:{[key:string]:{oldNode:string ,newNode:string}}={}
+        
+        for (const key of keys) {
+            const newNode = this.get(key) || "";
+            if (oldMapping.get(key) !== newNode) {
+                changedKeys.push(key);
+                movement[key]={oldNode:oldMapping.get(key)!,newNode}
+            }
+        }
+    
+        const totalMovedKeys = changedKeys.length;
+        const percentMoved = Math.round((totalMovedKeys / keys.length) * 100 * 100) / 100;
+
+    
+        return {
+            movement,
+            changedKeys,
+            totalMovedKeys,
+            percentMoved,
+        };
+    }
+    public trackKeyMovementOnRemoveNode(node: string, keys: string[]) {
+        const oldMapping=new Map<string, string>();
+        for (const key of keys) {
+            oldMapping.set(key, this.get(key) || "");
+        }
+        this.removeNode(node); 
+        const changedKeys: string[] = [];
+        const movement:{[key:string]:{oldNode:string ,newNode:string}}={}
+        for (const key of keys) {
+            const newNode = this.get(key) || "";
+            if (oldMapping.get(key) !== newNode) {
+                changedKeys.push(key);
+                movement[key]={oldNode:oldMapping.get(key)!,newNode}
+            }
+        }
+        const totalMovedkeys = changedKeys.length;
+        const percentMoved = (totalMovedkeys / keys.length) * 100;
+        return {movement,changedKeys,totalMovedkeys, percentMoved};
+    }
+    
 }
