@@ -38,7 +38,7 @@ import ConsistentHashRing from 'hashvector';
 const ring = new ConsistentHashRing(
   ['shard1', 'shard2', 'shard3', 'shard4', 'shard5', 'shard6', 'shard7', 'shard8', 'shard9', 'shard10', 'shard11', 'shard12', 'shard13', 'shard14', 'shard15', 'shard16', 'shard17', 'shard18', 'shard19', 'shard20'], // List of shards
   160,                            // Number of virtual nodes per shard
-  'sha256'                        // Hashing algorithm (optional, default: 'md5')
+  'sha256'                        // Hashing algorithm (optional, default: 'sha256')
 );
 
 // Add a node
@@ -72,13 +72,13 @@ for (const [shard, stats] of Object.entries(distribution)) {
 
 ## API
 
-### `new ConsistentHashRing(nodes: string[], virtualNodes = 160, algorithm: 'md5' | 'sha1' | 'sha256' | 'sha512' = 'md5')`
+### `new ConsistentHashRing(nodes: string[], virtualNodes = 135, algorithm: 'md5' | 'sha1' | 'sha256' | 'sha512' = 'sha256')`
 
 Creates a new consistent hash ring.
 
 - `nodes`: Array of node names (shards)
-- `virtualNodes`: Number of virtual nodes per shard (default: 160)
-- `algorithm`: Hashing algorithm to use (default: 'md5')
+- `virtualNodes`: Number of virtual nodes per shard (default: 135)
+- `algorithm`: Hashing algorithm to use (default: 'sha256')
 
 ### Methods
 
@@ -93,6 +93,12 @@ Gets the node for a given key.
 
 #### `getKeyDistribution(keys: string[] = []): Record<string, { count: number; percent: string }>`
 Gets the distribution of keys across nodes.
+
+#### `trackKeyMovementOnAddNode(node: string, keys: string[]): { movement: { [key: string]: { oldNode: string, newNode: string } }, changedKeys: string[], totalMovedKeys: number, percentMoved: number }`
+Tracks key movement on node addition.
+
+#### `trackKeyMovementOnRemoveNode(node: string, keys: string[]): { movement: { [key: string]: { oldNode: string, newNode: string } }, changedKeys: string[], totalMovedKeys: number, percentMoved: number }`
+Tracks key movement on node removal.
 
 ## Performance
 

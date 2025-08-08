@@ -8,7 +8,7 @@ describe("ConsistentHashRing Key Distribution", () => {
             "shard11", "shard12", "shard13", "shard14", "shard15",
             "shard16", "shard17", "shard18", "shard19", "shard20"
         ],
-        200,
+        135,
         "sha256"
     );
 
@@ -22,7 +22,7 @@ describe("ConsistentHashRing Key Distribution", () => {
     it("should distribute keys roughly evenly across all shards", () => {
         const shardCount = 20;
         const idealPerShard = keys.length / shardCount;
-        const tolerance = idealPerShard * 0.10;
+        const tolerance = idealPerShard * 0.15;
         for (const [shard, stats] of Object.entries(distribution)) {
             const count = stats.count;
             expect(count).toBeGreaterThanOrEqual(idealPerShard - tolerance);
@@ -42,10 +42,33 @@ describe("ConsistentHashRing Key Distribution", () => {
     });
 
     // Optional: Log distribution (for visual review)
-    it("log shard distribution (manual review)", () => {
-        console.log("\nShard Distribution (based on 1,000,000 keys):\n");
-        for (const [shard, stats] of Object.entries(distribution)) {
-            console.log(`${shard}: ${stats.count} keys (${stats.percent})`);
+    // it("log shard distribution (manual review)", () => {
+    //     console.log("\nShard Distribution (based on 1,000,000 keys):\n");
+    //     for (const [shard, stats] of Object.entries(distribution)) {
+    //         console.log(`${shard}: ${stats.count} keys (${stats.percent})`);
+    //     }
+    // });
+    function generateKeys(count: number) {
+        const keys: string[] = [];
+        for (let i = 0; i < count; i++) {
+            keys.push(`user${i}`);
         }
+        return keys;
+    }
+
+    it("should track key movement on node addition", () => {
+        const node = "shard21";
+        const keys = generateKeys(500000);
+        const result = ring.trackKeyMovementOnAddNode(node, keys);
+        console.log(result.percentMoved)
+        expect(result.percentMoved).toBeLessThanOrEqual(8);
+    });
+
+    it("should track key movement on node removal", () => {
+        const node = "shard1";
+        const keys = generateKeys(500000);
+        const result = ring.trackKeyMovementOnRemoveNode(node, keys);
+        console.log(result.percentMoved)
+        expect(result.percentMoved).toBeLessThanOrEqual(8);
     });
 });

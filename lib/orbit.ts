@@ -5,7 +5,7 @@ export default class ConsistentHashRing {
    private sortedKeys: string[];
    private virtualNodes: number;
    private algorithm: "md5" | "sha1" | "sha256" | "sha512";
-    constructor(nodes: string[], virtualNodes = 160, algorithm: "md5" | "sha1" | "sha256" | "sha512" = "md5") {
+    constructor(nodes: string[], virtualNodes = 135, algorithm: "md5" | "sha1" | "sha256" | "sha512" = "sha256") {
         this.ring = new Map();
         this.sortedKeys = [];
         this.virtualNodes = virtualNodes;
@@ -64,9 +64,7 @@ export default class ConsistentHashRing {
     public getAlgorithm() {
         return this.algorithm;
     }
-    public getNodes() {
-        return this.ring.values();
-    }
+   
     public getPhysicalNodes(): string[] {
         return Array.from(new Set(this.ring.values()));
     }
@@ -130,7 +128,7 @@ export default class ConsistentHashRing {
         }
     
         const totalMovedKeys = changedKeys.length;
-        const percentMoved = Math.round((totalMovedKeys / keys.length) * 100 * 100) / 100;
+        const percentMoved = Number(((totalMovedKeys / keys.length) * 100).toFixed(2));
 
     
         return {
@@ -156,7 +154,7 @@ export default class ConsistentHashRing {
             }
         }
         const totalMovedkeys = changedKeys.length;
-        const percentMoved = (totalMovedkeys / keys.length) * 100;
+        const percentMoved = Number(((totalMovedkeys / keys.length) * 100).toFixed(2));
         return {movement,changedKeys,totalMovedkeys, percentMoved};
     }
     

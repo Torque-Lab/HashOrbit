@@ -1,6 +1,6 @@
 {
   "name": "hashvector",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Lightweight library for consistent hashing",
   "main": "dist/src/index.js",
   "module": "dist/src/index.js",
